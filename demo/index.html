@@ -8,12 +8,14 @@
     <link href="css/b-table.css" rel="stylesheet">
 </head>
 <body>
-    <b-table></b-table>
+    <table is="b-table"></table>
     <script type="text/javascript">
-        var table = document.querySelector('b-table');
-        table.data = [
-            [1,2,3,4,5],
-            [6,7,8,9,0]
-        ];
+        window.addEventListener('WebComponentsReady', function() {
+            var table = document.querySelector('table');
+            table.data = [
+                [1,2,3,4,5],
+                [6,7,8,9,0]
+            ];
+        });
     </script>
 </body>

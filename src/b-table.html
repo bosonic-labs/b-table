@@ -1,10 +1,7 @@
-<element name="b-table">
+<element name="b-table" extends="table">
     <style>
         
     </style>
-    <template>
-        
-    </template>
     <script>
         ({
             set data(data) {
@@ -12,8 +9,7 @@
             },
 
             createdCallback: function() {
-                this.table = document.createElement('table');
-                this.appendChild(this.table);
+                
             },
 
             render: function(data) {
@@ -23,7 +19,7 @@
             },
 
             renderRow: function(rowData, index) {
-                var row = this.table.insertRow(index);
+                var row = this.insertRow(index);
                 rowData.forEach(function(cellData, cellIndex) {
                     var cell = row.insertCell(cellIndex),
                         cellContent = document.createTextNode(cellData);
