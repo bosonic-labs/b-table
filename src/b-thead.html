@@ -1,0 +1,59 @@
+<element name="b-thead" extends="thead">
+    <style>
+        
+    </style>
+    <script>
+        ({
+            get data() {
+                return this.parentNode.data;
+            },
+
+            get columns() {
+                return [].map.call(this.querySelectorAll('th'), function (th, index) {
+                    return {
+                        index: index,
+                        key: th.dataset.key,
+                        label: th.querySelector('button').textContent
+                    };
+                });
+            },
+
+            createdCallback: function() {
+                if (this.parentNode.sortable) {
+                    this.addSortListeners();
+                }
+            },
+
+            sort: function(e) {
+                var old = this.querySelector('th[sort]'),
+                    th = e.target.parentNode,
+                    key = th.dataset.key,
+                    direction  = th.getAttribute('sort') === 'desc' ? 'asc' : 'desc';
+
+                if (old) {
+                    old.removeAttribute('sort');
+                }
+                th.setAttribute('sort', direction);
+
+                var sorted = this.data.sort(function (a, b) {
+                    if (a[key] > b[key])
+                      return 1;
+                    if (a[key] < b[key])
+                      return -1;
+                    return 0;
+                });
+
+                if (direction === 'asc') sorted.reverse();
+
+                this.parentNode.data = sorted;
+            },
+
+            addSortListeners: function() {
+                var buttons = this.querySelectorAll('th button');
+                for (var i = 0; i < buttons.length; i++) {
+                    buttons[i].addEventListener('click', this.sort.bind(this), false);
+                }
+            }
+        });
+    </script>
+</element>

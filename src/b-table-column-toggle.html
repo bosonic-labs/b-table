@@ -1,0 +1,77 @@
+<element name="b-table-column-toggle">
+    <style>
+        
+    </style>
+    <script>
+        ({
+            get table() {
+                return document.getElementById(this.getAttribute('for'));
+            },
+
+            get thead() {
+                if (!this.table) return;
+                return this.table.querySelector('thead');
+            },
+
+            get hiddenColumns() {
+                return [].filter.call(this.querySelectorAll('input'), function(input) {
+                    return !input.checked;
+                }).map(function(input) {
+                    return input.dataset;
+                });
+            },
+
+            createdCallback: function() {
+                if (!this.table) return;
+                if (this.table.data) {
+                    this.render();
+                } else {
+                    this.renderListener = this.render.bind(this);
+                    this.table.addEventListener('data-set', this.renderListener);
+                }
+            },
+
+            render: function() {
+                if (this.renderListener) {
+                    this.table.removeEventListener('data-set', this.renderListener);
+                }
+                if (!this.thead || !this.thead.columns) return;
+                this.thead.columns.forEach(function(col) {
+                    var label = document.createElement('label'),
+                        input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.checked = true;
+                    input.dataset.key = col.key;
+                    input.dataset.index = col.index;
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(col.label));
+                    this.appendChild(label);
+
+                    input.addEventListener('change', this.toggle.bind(this), false);
+                }, this);
+
+                this.table.addEventListener('data-change', this.restoreHiddenColumns.bind(this));
+            },
+
+            toggle: function(e) {
+                this.toggleDisplay(e.target.dataset.key, e.target.dataset.index, e.target.checked);
+            },
+
+            toggleDisplay: function(key, index, show) {
+                var display = show ? 'table-cell' : 'none';
+                    th = this.thead.querySelector('th[data-key="'+key+'"]');
+
+                th.style.display = display;
+                [].forEach.call(this.table.querySelectorAll('td[data-index="'+index+'"]'), function(cell) {
+                    cell.style.display = display;
+                });
+            },
+
+            restoreHiddenColumns: function() {
+                this.hiddenColumns.forEach(function(col) {
+                    this.toggleDisplay(col.key, col.index, false);
+                }, this);
+            }
+        });
+    </script>
+</element>

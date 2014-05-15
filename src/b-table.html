@@ -4,8 +4,19 @@
     </style>
     <script>
         ({
+            get sortable() {
+                return this.hasAttribute('sortable');
+            },
+
+            get data() {
+                return this._data;
+            },
+
             set data(data) {
+                var event = this._data ? 'data-change' : 'data-set';
+                this._data = data;
                 this.render(data);
+                this.dispatchEvent(new CustomEvent(event));
             },
 
             createdCallback: function() {
@@ -13,18 +24,35 @@
             },
 
             render: function(data) {
+                var oldTbody = this.querySelector('tbody');
+                if (oldTbody) {
+                    this.removeChild(oldTbody);
+                }
+                var tbody = document.createElement('tbody');
+                this.appendChild(tbody);
                 data.forEach(function(row, index) {
-                    this.renderRow(row, index);
+                    this.renderRow(tbody, row, index);
                 }, this);
             },
 
-            renderRow: function(rowData, index) {
-                var row = this.insertRow(index);
-                rowData.forEach(function(cellData, cellIndex) {
-                    var cell = row.insertCell(cellIndex),
-                        cellContent = document.createTextNode(cellData);
-                    cell.appendChild(cellContent);
-                });
+            renderRow: function(tbody, rowData, index) {
+                var row = tbody.insertRow(index);
+                if (Array.isArray(rowData)) {
+                    rowData.forEach(function(cellData, cellIndex) {
+                        this.renderCell(row, cellData, cellIndex);
+                    }, this);
+                } else {
+                    Object.keys(rowData).forEach(function(key, cellIndex) {
+                        this.renderCell(row, rowData[key], cellIndex);
+                    }, this);
+                }
+            },
+
+            renderCell: function(row, cellData, cellIndex) {
+                var cell = row.insertCell(cellIndex),
+                    cellContent = document.createTextNode(cellData);
+                cell.appendChild(cellContent);
+                cell.dataset.index = cellIndex;
             }
         });
     </script>
